@@ -1,28 +1,41 @@
-import numpy as pd
+class Graph:
 
-def find(P,d):
+    def __init__(self, edges):
+        self._edges = edges
+
+    def neighbours(self, node):
+        if node not in self._edges:
+            return []
+        return self._edges[node]
+
+    def find(self, P,d):
     a=P[0]
     for i in P:
         if d[i]<d[a]:
-            a=i
+            a=i            
     return a 
 
-    
-def shortest_path(g,s):
-    P=[s]
-    n=len(g)
-    d=[int('inf') for i in range(n)]
-    d[s]=0
+    def shortest_path(self,start_node):
+    P=[start_node]
+    nodes = list(self._edges.keys())
+    d = {node: float('inf') for node in nodes}
+    d[start_node] = 0
     while len(P)!=0 :
-        a = find(P,d)
+        a = self.find(P,d)
         P.remove(a)
-        for u in neighbours(a):
+        for u , weight in self.neighbours(a):
+            if d[u]>d[a]+weight:
+                d[u]=d[a]+weight
             if u not in P:
                 P.append(u)
-                if d[u]>d[a]+g[u][a]:
-                    d[u]=d[a]+g[u][a]cg 
     return d
-        
+
+
+
+
+
+    
+
 
 
     
