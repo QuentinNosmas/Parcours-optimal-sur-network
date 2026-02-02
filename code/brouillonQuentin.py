@@ -20,7 +20,7 @@ def shortest_path(g,s):
             if u not in P:
                 P.append(u)
                 if d[u]>d[a]+g[u][a]:
-                    d[u]=d[a]+g[u][a]
+                    d[u]=d[a]+g[u][a]cg 
     return d
         
 
