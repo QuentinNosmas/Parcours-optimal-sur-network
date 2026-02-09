@@ -1,4 +1,7 @@
 import heapq
+from network import Network
+import os
+
 
 class Graph:
 
