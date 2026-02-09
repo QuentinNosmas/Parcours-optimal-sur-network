@@ -10,15 +10,6 @@ class Graph:
             return []
         return self._edges[node]
 
-    def find(self, P,d):
-        if not P:
-            return None
-        a=P[0]
-        for i in P:
-            if d[i]<d[a]:
-                a=i            
-        return a 
-
     def shortest_path(self,start_node):
         P=[(0,start_node)]
         nodes = list(self._edges.keys())
