@@ -37,7 +37,17 @@ class Graph:
         return d,predecesseurs
 
 
-4
+graph_test = Network.from_file(r"D:\Ensae\1A\S2\Projet_prog\ensae-prog26\examples\medium-nofatigue.txt")
+assert graph_test.start == "v0"
+assert graph_test.end == "v99"
+
+graph_test = graph_test.build_simple_graph()
+res = graph_test.shortest_path("v0")
+print(res[1])
+
+
+
+
 
 
     

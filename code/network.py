@@ -56,7 +56,7 @@ class Network:
         Builds an object of type Graph from the network, by ignoring the fatigue coefficient. 
         """
         sans_fatigue = {}
-        for node , neighbours_list in self.roads.items():
+        for node , neighbours_list in self._roads.items():
             simple_neighbours = [(neighbour[0], neighbour[1]) for neighbour in neighbours_list]
             sans_fatigue[node]= simple_neighbours 
         
