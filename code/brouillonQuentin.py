@@ -43,7 +43,7 @@ assert graph_test.end == "v99"
 
 graph_test = graph_test.build_simple_graph()
 res = graph_test.shortest_path("v0")
-print(res[1])
+print(res[1]) #C'est bon l'algorithme de dijkstra est correct
 
 
 
