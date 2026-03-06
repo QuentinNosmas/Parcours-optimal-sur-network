@@ -5,7 +5,7 @@ def build_extended_graph(g : Network) -> Graph:
     """
     Construit un graphe étendu à partir de g. Les sommets sont les
     (u,F) où u est sommet de g et F est une fatigue entre 0 et une 
-    fatigue maximum f_max. Les arêtes sont les (u,F) -> (v,F+f) 
+    fatigue maximum Fmax. Les arêtes sont les (u,F) -> (v,F+f) 
     de poids (1+F)*poids(u->v), quand u->v a une fatigue f dans g, 
     pour toute F telle que F+f <= f_max.
     """
