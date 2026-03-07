@@ -23,11 +23,27 @@ def build_extended_graph(g : Network) -> Graph:
             F = voisin[2]
             for f in range(Fmax + 1):
                 if f + F <= Fmax:
-                    edges[(sommet, f)].append(((voisin[0], f + F), (1 + f) * voisin[1]))
+                    edges[(sommet, f)].append(((voisin[0], f + F), (1 + f)*voisin[1]))
     
     return Graph(edges)
-        
-            
+
+class GraphImplicit(Graph):
+
+    def __init__(self, network : Network):
+        self.network = network
+        n = len(network._roads)
+        fatigues = [voisin[2] for sommet in network._roads for voisin in network._roads[sommet]]
+        self.Fmax = (n-1)*max(fatigues) if fatigues else 0
+    
+    def neighbours(self, node):
+        res = []
+        sommet, f = node
+        for voisin in self.network._roads[sommet]:
+            F = voisin[2]
+            if f + F <= self.Fmax :
+                res.append(((voisin[0], f + F), (1 + f)*voisin[1]))
+        return res
+
             
 
 
