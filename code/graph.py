@@ -30,23 +30,32 @@ class Graph:
             return []
         return self._edges[node]
     
-    def shortest_path(self,start_node):
-        P=[(0,start_node)]
-        nodes = list(self._edges.keys())
-        d = {node : float('inf') for node in nodes}
-        d[start_node] = 0
-        predecesseurs = {node: None for node in nodes}
-        while len(P)!=0 :
-            dist_a, u_actuel = heapq.heappop(P)
+    def shortest_path(self,vs):
+        """
+        Renvoie tous les plus courts chemins ainsi que les distances
+        correspondantes pour un graphe orienté à poids poisitifs
+        sans fatigue. C'est un Dijkstra.
+        """
+        file_prio = [(0,vs)]
+        d = {vs: 0}
+        predecesseurs = {vs: None}
+
+        while file_prio:
+            dist_a,u_actuel = heapq.heappop(file_prio)
 
             if dist_a > d[u_actuel]:
                 continue
 
-            for u , weight in self.neighbours( u_actuel ):
-                if d[u]>d[u_actuel]+weight:
-                    d[u]=d[u_actuel]+weight
+            for u, poids in self.neighbours(u_actuel):
+                if u not in d:
+                    d[u] = float("inf")
+                    predecesseurs[u] = None
+
+                nouvelle_distance = d[u_actuel] + poids
+                if nouvelle_distance < d[u]:
+                    d[u] = nouvelle_distance
                     predecesseurs[u] = u_actuel
-                    heapq.heappush(P, (d[u], u))
+                    heapq.heappush(file_prio,(d[u],u))
 
         return d,predecesseurs
 

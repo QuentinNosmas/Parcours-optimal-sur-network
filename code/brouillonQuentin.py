@@ -35,6 +35,32 @@ class Graph:
                     heapq.heappush(P, (d[u], u))
 
         return d,predecesseurs
+    
+    def shortest_path(self,vs):
+        file_prio = [(0,vs)]
+        d = {vs: 0}
+        predecesseurs = {vs: None}
+
+        while file_prio:
+            dist_a,u_actuel = heapq.heappop(file_prio)
+
+            if dist_a > d[u_actuel]:
+                continue
+
+            for u, poids in self.neighbours(u_actuel):
+                if u not in d:
+                    d[u] = float("inf")
+                    predecesseurs[u] = None
+
+                nouvelle_distance = d[u_actuel] + poids
+                if nouvelle_distance < d[u]:
+                    d[u] = nouvelle_distance
+                    predecesseurs[u] = u_actuel
+                    heapq.heappush(file_prio,(d[u],u))
+
+        return d,predecesseurs
+
+ 
 
 
 graph_test = Network.from_file(r"D:\Ensae\1A\S2\Projet_prog\ensae-prog26\examples\medium-nofatigue.txt")
