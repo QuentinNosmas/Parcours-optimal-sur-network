@@ -30,13 +30,13 @@ class Graph:
             return []
         return self._edges[node]
     
-    def shortest_path(self,vs):
+    def shortest_path(self, vs):
         """
         Renvoie tous les plus courts chemins ainsi que les distances
         correspondantes pour un graphe orienté à poids poisitifs
         sans fatigue. C'est un Dijkstra.
         """
-        file_prio = [(0,vs)]
+        file_prio = [(0, vs)]
         d = {vs: 0}
         predecesseurs = {vs: None}
 
@@ -55,9 +55,9 @@ class Graph:
                 if nouvelle_distance < d[u]:
                     d[u] = nouvelle_distance
                     predecesseurs[u] = u_actuel
-                    heapq.heappush(file_prio,(d[u],u))
+                    heapq.heappush(file_prio, (d[u], u))
 
-        return d,predecesseurs
+        return d, predecesseurs
 
 
 
