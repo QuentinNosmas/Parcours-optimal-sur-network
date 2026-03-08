@@ -51,7 +51,7 @@ class Network:
 
         return cls(roads=roads, start=start, end=end)
 
-    def build_simple_graph(self):
+    def build_simple_graph(self) -> Graph:
         """
         Builds an object of type Graph from the network, by ignoring the fatigue coefficient. 
         """

@@ -9,6 +9,8 @@ class GraphImplicit(Graph):
     """
     Cette classe se sert du network pour redéfinir
     la méthode neighbours ensuite utilisée par shortest_path.
+    Les arêtes ne sont pas stockées, mais calculées à la demande
+    par neighbours.
     """
 
     def __init__(self, network : Network):
@@ -43,7 +45,7 @@ def chemin(vs, vt, pred):
 def chemin_le_plus_court(g : Network, vs, vt):
     """
     Renvoie le chemin le plus court entre vs et vt dans un network,
-    avec les distance associée.
+    avec la distance associée.
     """
     g_extend_implicit = GraphImplicit(g)
     d, pred = g_extend_implicit.shortest_path((vs, 0))
@@ -59,4 +61,35 @@ def chemin_le_plus_court(g : Network, vs, vt):
     meilleur_etat, meilleur_d = min(arrivees, key = lambda x : x[1])
     chemin_etendu = chemin((vs, 0), meilleur_etat, pred)
     return [sommet for sommet, _ in chemin_etendu], meilleur_d
+
+
+### Test 1.1 : Test de buil_simple_graph et shortest_path
+
+graph_test = Network.from_file(r"D:\Ensae\1A\S2\Projet_prog\ensae-prog26\examples\medium-nofatigue.txt")
+assert graph_test.start == "v0"
+assert graph_test.end == "v99"
+
+graph_test = graph_test.build_simple_graph()
+d, pred = graph_test.shortest_path("v0")
+assert d["v99"] == 1771 #C'est bon l'algorithme de dijkstra est correct
+
+### Test 1.2 : Test de shortest_path sur une graph étendu
+
+graph_test = Network.from_file(r"D:\Ensae\1A\S2\Projet_prog\ensae-prog26\examples\medium-smallfatigue.txt")
+graph_test = graph_test.build_extended_graph()
+d, pred = graph_test.shortest_path(("v0", 0))
+arrivees = []
+for etat in d.keys():
+    if etat[0] == "v99":
+        arrivees.append((etat, d[etat]))  
+meilleur_etat, meilleur_d = min(arrivees, key = lambda x : x[1]) # On prend l'état ("v99", F) de distance minimale
+assert meilleur_d == 29934
+
+### Test 1.3 : Test de chemin_le_plus_court
+
+graph_test = Network.from_file(r"D:\Ensae\1A\S2\Projet_prog\ensae-prog26\examples\medium-smallfatigue.txt")
+chemin, d = chemin_le_plus_court(graph_test, graph_test.start, graph_test.end)
+assert d == 29934
+
+print("Tous les tests ont réussi.")
 
