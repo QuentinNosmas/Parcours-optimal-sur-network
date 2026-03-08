@@ -65,7 +65,7 @@ def chemin_le_plus_court(g : Network, vs, vt):
 
 ### Test 1.1 : Test de buil_simple_graph et shortest_path
 
-graph_test = Network.from_file(r"D:\Ensae\1A\S2\Projet_prog\ensae-prog26\examples\medium-nofatigue.txt")
+graph_test = Network.from_file(r"examples\medium-nofatigue.txt")
 assert graph_test.start == "v0"
 assert graph_test.end == "v99"
 
@@ -75,7 +75,7 @@ assert d["v99"] == 1771 #C'est bon l'algorithme de dijkstra est correct
 
 ### Test 1.2 : Test de shortest_path sur une graph étendu
 
-graph_test = Network.from_file(r"D:\Ensae\1A\S2\Projet_prog\ensae-prog26\examples\medium-smallfatigue.txt")
+graph_test = Network.from_file(r"examples\medium-smallfatigue.txt")
 graph_test = graph_test.build_extended_graph()
 d, pred = graph_test.shortest_path(("v0", 0))
 arrivees = []
@@ -87,7 +87,7 @@ assert meilleur_d == 29934
 
 ### Test 1.3 : Test de chemin_le_plus_court
 
-graph_test = Network.from_file(r"D:\Ensae\1A\S2\Projet_prog\ensae-prog26\examples\medium-smallfatigue.txt")
+graph_test = Network.from_file(r"examples\medium-smallfatigue.txt")
 chemin, d = chemin_le_plus_court(graph_test, graph_test.start, graph_test.end)
 assert d == 29934
 
