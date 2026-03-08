@@ -25,19 +25,26 @@ class GraphImplicit(Graph):
             if f + F <= self.Fmax :
                 res.append(((voisin[0], f + F), (1 + f)*voisin[1]))
         return res
-    
 
 def chemin(vs, vt, pred):
-    
-
+    if vt == vs:
+        return [vs]
+    else:
+        return chemin(vs, pred[vt], pred) + [vt]
 
 def chemin_le_plus_court(g : Network, vs, vt):
     g_extend_implicit = GraphImplicit(g)
     d, pred = g_extend_implicit.shortest_path((vs, 0))
     arrivees = []
+    
     for etat in d.keys():
         if etat[0] == vt:
-            arrivees.append((etat, d[vt]))
+            arrivees.append((etat, d[etat]))
+    
+    if not arrivees:
+        return None, float("inf")
+    
     meilleur_etat, meilleur_d = min(arrivees, key = lambda x : x[1])
-    return meilleur_etat, meilleur_d
+    chemin_etendu = chemin((vs, 0), meilleur_etat, pred)
+    return [sommet for sommet, _ in chemin_etendu], meilleur_d
 
