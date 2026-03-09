@@ -72,6 +72,13 @@ res = graph_test.shortest_path("v0")
 print(res[1]) #C'est bon l'algorithme de dijkstra est correct
 
 
+def shortest_past_pareto_pruning(self, start, end):
+    """
+    Objectif : On veut désormais rajouter l'information temps t, dans l'objectif d'avorter le parcours d'un chemin où on aurait atteint un sommet v depuis start avec un 
+    état non Pareto optimal (on a déja fait mieux avant) (Pareto optimal dans le sens où il a une fatigue plus faible et un temps t moins grand ( f1 < f2 et t1 < t2) )
+    """
+    
+
 
 
 
