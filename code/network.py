@@ -88,6 +88,28 @@ class Network:
     
         return Graph(edges)
     
+    def chemin_le_plus_court(self):
+        """
+    Renvoie le chemin le plus court entre vs et vt dans un network,
+    avec la distance associée.
+    """
+        vs = self.start
+        vt = self.end
+        net_extend_implicit = GraphImplicit(self)
+        d, pred = net_extend_implicit.shortest_path((vs, 0))
+        arrivees = []
+    
+        for etat in d.keys():
+           if etat[0] == vt:
+                arrivees.append((etat, d[etat]))  #arrivees contient tous les sommets de la forme (vt, F)
+    
+        if not arrivees:
+            return None, float("inf")
+    # On cherche maintenant, parmi les sommets de la forme (vt, F), celui avec la distance minimale à (vs, 0)
+        meilleur_etat, meilleur_d = min(arrivees, key = lambda x : x[1])
+        chemin_etendu = chemin((vs, 0), meilleur_etat, pred)
+        return [sommet for sommet, _ in chemin_etendu], meilleur_d
+    
 class GraphImplicit(Graph):
     """
     Cette classe se sert du network pour redéfinir

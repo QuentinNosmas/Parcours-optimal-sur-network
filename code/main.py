@@ -26,7 +26,7 @@ assert meilleur_d == 29934
 ### Test 1.3 : Test de chemin_le_plus_court
 
 graph_test = Network.from_file(r"examples\medium-smallfatigue.txt")
-chemin, d = chemin_le_plus_court(graph_test, graph_test.start, graph_test.end)
+chemin, d = graph_test.chemin_le_plus_court()
 assert d == 29934
 
 print("Tous les tests ont réussi.")
