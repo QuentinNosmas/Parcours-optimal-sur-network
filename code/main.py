@@ -42,13 +42,13 @@ def chemin(vs, vt, pred):
     else:
         return chemin(vs, pred[vt], pred) + [vt]
 
-def chemin_le_plus_court(g : Network, vs, vt):
+def chemin_le_plus_court(network : Network, vs, vt):
     """
     Renvoie le chemin le plus court entre vs et vt dans un network,
     avec la distance associée.
     """
-    g_extend_implicit = GraphImplicit(g)
-    d, pred = g_extend_implicit.shortest_path((vs, 0))
+    net_extend_implicit = GraphImplicit(network)
+    d, pred = net_extend_implicit.shortest_path((vs, 0))
     arrivees = []
     
     for etat in d.keys():
