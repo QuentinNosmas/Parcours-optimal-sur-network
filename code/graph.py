@@ -30,7 +30,7 @@ class Graph:
             return []
         return self._edges[node]
     
-    def shortest_path(self, vs):
+    def shortest_path(self, vs, vt):
         """
         Renvoie tous les plus courts chemins ainsi que les distances
         correspondantes pour un graphe orienté à poids poisitifs
@@ -40,6 +40,12 @@ class Graph:
            d : dictionnaire des distances minimales à vs pour chaque sommet
            predecesseur : le disctionnaire des predecesseur pour chaque sommet
         """
+        def chemin(vs, vt, pred): 
+            if vt == vs:
+                return [vs]
+            else:
+                return chemin(vs, pred[vt], pred) + [vt]
+        
         file_prio = [(0, vs)]
         d = {vs: 0}
         predecesseurs = {vs: None}
@@ -49,6 +55,9 @@ class Graph:
 
             if dist_a > d[u_actuel]:  #Si le couple (distance, sommet) est obsolète, on passe au sommet suivant
                 continue
+
+            if u_actuel[0] == vt:  #Dès qu'on extrait une sommet (vt, F) de la file, on arrête l'algorithme.
+                break
 
             for u, poids in self.neighbours(u_actuel):
                 if u not in d:  #Lorsque l'on découvre un sommet, on l'ajoute à d et predecesseurs
@@ -60,8 +69,12 @@ class Graph:
                     d[u] = nouvelle_distance
                     predecesseurs[u] = u_actuel
                     heapq.heappush(file_prio, (d[u], u))
+        
+        path = [sommet[0] for sommet in chemin(vs, u_actuel, predecesseurs)]
 
-        return d, predecesseurs
+        return dist_a, path
+    
+    
     
 
 
