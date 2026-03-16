@@ -78,6 +78,56 @@ def shortest_past_pareto_pruning(self, start, end):
     Objectif : On veut désormais rajouter l'information temps t, dans l'objectif d'avorter le parcours d'un chemin où on aurait atteint un sommet v depuis start avec un 
     état non Pareto optimal (on a déja fait mieux avant) (Pareto optimal dans le sens où il a une fatigue plus faible et un temps t moins grand ( f1 < f2 et t1 < t2) )
     """
+    pq = [(0,0,heapq)]
+    d= {node : [] for node in self._roads}
+
+    while pq:
+        t, f, u = heapq.heappop(pq)
+
+        if u == end : 
+            return t,f
+
+        est_dominé = False
+        for t_opt, f_opt in d[u]:
+            if t >= t_opt and f >= f_opt :
+                est_dominé = True 
+
+            if est_dominé : 
+                continue 
+
+            if t < t_opt and f < f_opt :
+                d[u] = [(t,f)]
+
+            else :
+                d[u].append((t , f))
+             
+            for voisin in self._roads[u]:
+            v = voisin[0]
+            poids_base = voisin[1]
+            fatigue_arete = voisin[2]
+            
+            new_f = f + fatigue_arete
+
+            new_t = t + (1 + f) * poids_base 
+            
+            heapq.heappush(pq, (new_t, new_f, v))
+
+    return float('inf'), float('inf')
+
+
+
+
+def shrotest_path(self , vs , vt , method):
+
+    if method not in ["simple" , "pareto-prunning"]:
+        raise ValueError("Nan t'es trompé")
+    
+    if method == "simple":
+        
+
+
+
+
     
 
 
