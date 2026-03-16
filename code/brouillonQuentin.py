@@ -36,29 +36,30 @@ class Graph:
 
         return d,predecesseurs
     
-    def shortest_path(self,vs):
-        file_prio = [(0,vs)]
-        d = {vs: 0}
-        predecesseurs = {vs: None}
+    def shortest_path(self, vs):
 
-        while file_prio:
-            dist_a,u_actuel = heapq.heappop(file_prio)
+    file_prio = [(0, vs)]
+    d = {vs: 0}
+    predecesseurs = {vs: None}
 
-            if dist_a > d[u_actuel]:
-                continue
+    while file_prio:
+        dist_a, u_actuel = heapq.heappop(file_prio)
 
-            for u, poids in self.neighbours(u_actuel):
-                if u not in d:
-                    d[u] = float("inf")
-                    predecesseurs[u] = None
+        if dist_a > d[u_actuel]:
+            continue
 
-                nouvelle_distance = d[u_actuel] + poids
-                if nouvelle_distance < d[u]:
-                    d[u] = nouvelle_distance
-                    predecesseurs[u] = u_actuel
-                    heapq.heappush(file_prio,(d[u],u))
+        for u, poids in self.neighbours(u_actuel):
+            if u not in d:
+                d[u] = float("inf")
+                predecesseurs[u] = None
 
-        return d,predecesseurs
+            nouvelle_distance = d[u_actuel] + poids
+            if nouvelle_distance < d[u]:
+                d[u] = nouvelle_distance
+                predecesseurs[u] = u_actuel
+                heapq.heappush(file_prio, (d[u], u))
+
+    return d, predecesseurs
 
  
 
