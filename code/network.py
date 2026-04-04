@@ -51,15 +51,22 @@ class Network:
 
         return cls(roads=roads, start=start, end=end)
 
-    def build_simple_graph(self) -> Graph:
+    def build_simple_graph(self, inverse=False) -> Graph:
         """
-        Builds an object of type Graph from the network, by ignoring the fatigue coefficient. 
+        Construit un graphe simple depuis le network.
+        Si inverse=True, les arêtes sont inversées — utilisé pour précalculer h dans A*.
         """
         sans_fatigue = {}
-        for node , neighbours_list in self._roads.items():
-            simple_neighbours = [(neighbour[0], neighbour[1]) for neighbour in neighbours_list]
-            sans_fatigue[node]= simple_neighbours 
-        
+        for node, neighbours_list in self._roads.items():
+            if not inverse:
+                sans_fatigue.setdefault(node, [])
+                for voisin, longueur, _ in neighbours_list:
+                    sans_fatigue[node].append((voisin, longueur))
+                    sans_fatigue.setdefault(voisin, [])
+            else:
+                for voisin, longueur, _ in neighbours_list:
+                    sans_fatigue.setdefault(voisin, []).append((node, longueur))
+                    sans_fatigue.setdefault(node, [])
         return Graph(sans_fatigue)
     
     def build_extended_graph(self) -> Graph:

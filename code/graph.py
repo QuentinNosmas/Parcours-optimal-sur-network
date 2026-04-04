@@ -31,35 +31,75 @@ class Graph:
         if node not in self._edges:
             return []
         return self._edges[node]
-
-    def shortest_path(self, vs, vt, is_target=None):
-        """
-        Retourne le chemin le plus court de vs à vt (algorithme de Dijkstra).
     
-        Paramètres:
-        -----------
-        vs : nœud source
-        vt : nœud cible (comparé directement au nœud extrait)
-        is_target : fonction qui nous dit si on a atteint vt, permet de faire fonctionner shortest path sur un graphe simple et aussi sur un graphe étendu
-        Retourne:
-        ---------
-        (path, distance) : liste des nœuds du chemin et distance totale,
-                            ou (None, inf) si vt est inatteignable.
+    def distances_depuis(self, source):
         """
-
-        if is_target is None:
-            is_target = lambda node: node == vt
-
-        file_prio = [(0, vs)]
-        d = {vs: 0}
-        predecesseurs = {vs: None}
-        u_actuel = None
+        Retourne le dictionnaire des distances minimales depuis source
+        vers tous les noeuds atteignables. Utilisé pour précalculer h dans A*.
+        """
+        file_prio = [(0, source)]
+        d = {source: 0}
 
         while file_prio:
             dist_a, u_actuel = heapq.heappop(file_prio)
 
             if dist_a > d[u_actuel]:
                 continue
+
+            for u, poids in self.neighbours(u_actuel):
+                if u not in d:
+                    d[u] = float("inf")
+                nouvelle_distance = d[u_actuel] + poids
+                if nouvelle_distance < d[u]:
+                    d[u] = nouvelle_distance
+                    heapq.heappush(file_prio, (d[u], u))
+
+        return d
+
+    def shortest_path(self, vs, vt, is_target=None, pruning=False, heuristique=None):
+        """
+        Retourne le chemin le plus court de vs à vt.
+        Implémente Dijkstra (cas particulier de A* avec h=0) et A* avec heuristique.
+
+        Paramètres:
+        -----------
+        vs : nœud source
+        vt : nœud cible
+        is_target : fonction qui dit si un nœud est la cible.
+                Si None, on compare directement u_actuel == vt.
+        pruning : si True, active le Pareto pruning.
+        heuristique : fonction h(node) -> estimation du temps restant.
+                  Si None, h=0 partout (Dijkstra classique).
+
+        Retourne:
+        ---------
+        (chemin, distance) : liste des nœuds et distance totale,
+                         ou (None, inf) si vt est inatteignable.
+        """
+        if is_target is None:
+            is_target = lambda node: node == vt
+
+        h = heuristique if heuristique is not None else lambda node: 0
+
+        file_prio = [(0, 0, vs)]  # (f=g+h, g, noeud)
+        d = {vs: 0}
+        predecesseurs = {vs: None}
+        u_actuel = None
+        pareto = {}
+        compteur_prune = 0
+
+        while file_prio:
+            _, dist_a, u_actuel = heapq.heappop(file_prio)
+
+            if dist_a > d[u_actuel]:
+                continue
+
+            if pruning:
+                sommet, f = u_actuel
+                if sommet in pareto and any(t <= dist_a and fa <= f for t, fa in pareto[sommet]):
+                    compteur_prune += 1
+                    continue
+                pareto.setdefault(sommet, []).append((dist_a, f))
 
             if is_target(u_actuel):
                 break
@@ -68,24 +108,24 @@ class Graph:
                 if u not in d:
                     d[u] = float("inf")
                     predecesseurs[u] = None
-
                 nouvelle_distance = d[u_actuel] + poids
                 if nouvelle_distance < d[u]:
                     d[u] = nouvelle_distance
                     predecesseurs[u] = u_actuel
-                    heapq.heappush(file_prio, (d[u], u))
+                    heapq.heappush(file_prio, (d[u] + h(u), d[u], u))
 
-        # vt inatteignable
-        if not is_target(u_actuel): 
+        if not is_target(u_actuel):
             return None, float("inf")
 
-        # Reconstruction du chemin
         chemin = []
-        noeud = u_actuel 
+        noeud = u_actuel
         while noeud is not None:
             chemin.append(noeud)
             noeud = predecesseurs[noeud]
         chemin.reverse()
+
+        if pruning:
+            print(f"Noeuds prunés : {compteur_prune}")
 
         return chemin, d[u_actuel]
     
