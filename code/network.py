@@ -71,8 +71,8 @@ class Network:
         pour toute F telle que F+f <= Fmax.
         """
         n = len(self._roads)
-        fatigues = [voisin[2] for sommet in self._roads for voisin in self._roads[sommet]]
-        Fmax = (n-1)*max(fatigues) if fatigues else 0  # fatigue maximale d'un chemin optimal  
+        fatigues = [voisin[2] for sommet in self._roads for voisin in self._roads[sommet]] #on récupère toutes les fatigues
+        Fmax = (n-1)*max(fatigues) if fatigues else 0  # fatigue maximale d'un chemin optimal puisque pour parcourir un graphe à n noeuds il faut n-1 arrêtes 
         edges = {}
     
         for sommet in self._roads:  #Ajoute tous les sommets (u,F) où u est dans g et F < Fmax + 1
@@ -107,8 +107,10 @@ class GraphImplicit(Graph):
         Construit les voisins de node dans le graphe étendu, de la 
         même manière que dans build_extended_graph.
         """
-        res = []
         sommet, f = node
+        if sommet not in self.network._roads:
+            return []
+        res = []
         for voisin in self.network._roads[sommet]: #On crée tous les voisins du sommet (sommet, f)
             F = voisin[2]
             if f + F <= self.Fmax :
