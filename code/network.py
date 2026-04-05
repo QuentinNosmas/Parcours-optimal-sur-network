@@ -61,11 +61,11 @@ class Network:
             if not inverse:
                 sans_fatigue.setdefault(node, [])
                 for voisin, longueur, _ in neighbours_list:
-                    sans_fatigue[node].append((voisin, longueur))
+                    sans_fatigue[node].append((voisin, longueur)) #Construit les arêtes sans la fatigue
                     sans_fatigue.setdefault(voisin, [])
             else:
                 for voisin, longueur, _ in neighbours_list:
-                    sans_fatigue.setdefault(voisin, []).append((node, longueur))
+                    sans_fatigue.setdefault(voisin, []).append((node, longueur)) #Construit les arêtes à l'envers
                     sans_fatigue.setdefault(node, [])
         return Graph(sans_fatigue)
     

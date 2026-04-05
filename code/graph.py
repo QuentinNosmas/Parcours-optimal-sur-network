@@ -32,25 +32,26 @@ class Graph:
             return []
         return self._edges[node]
     
-    def distances_depuis(self, source):
+    def distances_depuis(self, source) -> dict:
         """
         Retourne le dictionnaire des distances minimales depuis source
-        vers tous les noeuds atteignables. Utilisé pour précalculer h dans A*.
+        vers tous les noeuds atteignables. Utilisé pour précalculer h dans A*. 
+        C'est un Dijkstra.
         """
-        file_prio = [(0, source)]
+        file_prio = [(0, source)]  #initialisation de la file et du dictionnaires des distances
         d = {source: 0}
 
-        while file_prio:
+        while file_prio:  #Boucle principale : on extrait tant que des noeuds sont dans la file
             dist_a, u_actuel = heapq.heappop(file_prio)
 
-            if dist_a > d[u_actuel]:
+            if dist_a > d[u_actuel]:  #Si le sommet retiré est obsolète on l'ignore
                 continue
 
             for u, poids in self.neighbours(u_actuel):
                 if u not in d:
                     d[u] = float("inf")
                 nouvelle_distance = d[u_actuel] + poids
-                if nouvelle_distance < d[u]:
+                if nouvelle_distance < d[u]: #Si on a trouvé un meilleur chemin à la source, on actualise le dictionnaire des distances
                     d[u] = nouvelle_distance
                     heapq.heappush(file_prio, (d[u], u))
 
@@ -79,32 +80,32 @@ class Graph:
         if is_target is None:
             is_target = lambda node: node == vt
 
-        h = heuristique if heuristique is not None else lambda node: 0
+        h = heuristique if heuristique is not None else lambda node: 0 #Si aucune heuristique n'est donnée, on prend h = 0
 
-        file_prio = [(0, 0, vs)]  # (f=g+h, g, noeud)
+        file_prio = [(0, 0, vs)]  # (f = g + ditance approximée par l'heuristique, g = distance à la source, noeud)
         d = {vs: 0}
-        predecesseurs = {vs: None}
+        predecesseurs = {vs: None}      #Initialisations    
         u_actuel = None
-        pareto = {}
-        compteur_prune = 0
+        pareto = {} #Dictionnaire permettant de mémoriser les sommets avec la fatigue et la distance avec lesquelles on les a rencontré
+        compteur_prune = 0 #Enregistre le nombre de sommets éliminés par prunning.
 
-        while file_prio:
+        while file_prio: #Boucle principale
             _, dist_a, u_actuel = heapq.heappop(file_prio)
 
-            if dist_a > d[u_actuel]:
+            if dist_a > d[u_actuel]: #Noeud extrait obsolète
                 continue
 
-            if pruning:
+            if pruning: 
                 sommet, f = u_actuel
-                if sommet in pareto and any(t <= dist_a and fa <= f for t, fa in pareto[sommet]):
+                if sommet in pareto and any(t <= dist_a and fa <= f for t, fa in pareto[sommet]): #sommet déjà rencontré avec distance et fatigue plus faible
                     compteur_prune += 1
-                    continue
-                pareto.setdefault(sommet, []).append((dist_a, f))
+                    continue  #on l'ignore
+                pareto.setdefault(sommet, []).append((dist_a, f)) #Sinon on le mémorise 
 
-            if is_target(u_actuel):
+            if is_target(u_actuel): #Condition d'arrêt : on est arrivé à destination
                 break
 
-            for u, poids in self.neighbours(u_actuel):
+            for u, poids in self.neighbours(u_actuel): #même boucle que Dijsktra, modulée de l'heuristique
                 if u not in d:
                     d[u] = float("inf")
                     predecesseurs[u] = None
@@ -112,12 +113,12 @@ class Graph:
                 if nouvelle_distance < d[u]:
                     d[u] = nouvelle_distance
                     predecesseurs[u] = u_actuel
-                    heapq.heappush(file_prio, (d[u] + h(u), d[u], u))
+                    heapq.heappush(file_prio, (d[u] + h(u), d[u], u)) #La priorité donnée dépend de l'heuristique
 
-        if not is_target(u_actuel):
+        if not is_target(u_actuel): #Aucun chemin ne mène à vt
             return None, float("inf")
 
-        chemin = []
+        chemin = []    # Reconstruction du chemin
         noeud = u_actuel
         while noeud is not None:
             chemin.append(noeud)
