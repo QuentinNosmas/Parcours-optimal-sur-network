@@ -59,7 +59,7 @@ class Network:
         sans_fatigue = {}
         for node, neighbours_list in self._roads.items():
             if not inverse:
-                sans_fatigue.setdefault(node, [])
+                sans_fatigue.setdefault(node, []) #ajoute le neoud s'il n'existe pas déjà
                 for voisin, longueur, _ in neighbours_list:
                     sans_fatigue[node].append((voisin, longueur)) #Construit les arêtes sans la fatigue
                     sans_fatigue.setdefault(voisin, [])
@@ -101,6 +101,8 @@ class GraphImplicit(Graph):
     la méthode neighbours ensuite utilisée par shortest_path.
     Les arêtes ne sont pas stockées, mais calculées à la demande
     par neighbours.
+
+    Permet de ne pas construire le graphe étendu entièrement.
     """
 
     def __init__(self, network : Network):

@@ -38,10 +38,10 @@ class Graph:
         vers tous les noeuds atteignables. Utilisé pour précalculer h dans A*. 
         C'est un Dijkstra.
         """
-        file_prio = [(0, source)]  #initialisation de la file et du dictionnaires des distances
+        file_prio = [(0, source)]  
         d = {source: 0}
 
-        while file_prio:  #Boucle principale : on extrait tant que des noeuds sont dans la file
+        while file_prio:  
             dist_a, u_actuel = heapq.heappop(file_prio)
 
             if dist_a > d[u_actuel]:  #Si le sommet retiré est obsolète on l'ignore
@@ -84,12 +84,12 @@ class Graph:
 
         file_prio = [(0, 0, vs)]  # (f = g + ditance approximée par l'heuristique, g = distance à la source, noeud)
         d = {vs: 0}
-        predecesseurs = {vs: None}      #Initialisations    
+        predecesseurs = {vs: None}        
         u_actuel = None
         pareto = {} #Dictionnaire permettant de mémoriser les sommets avec la fatigue et la distance avec lesquelles on les a rencontré
         compteur_prune = 0 #Enregistre le nombre de sommets éliminés par prunning.
 
-        while file_prio: #Boucle principale
+        while file_prio: 
             _, dist_a, u_actuel = heapq.heappop(file_prio)
 
             if dist_a > d[u_actuel]: #Noeud extrait obsolète
