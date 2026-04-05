@@ -76,9 +76,13 @@ class Network:
         fatigue maximum Fmax. Les arêtes sont les (u,F) -> (v,F+f) 
         de poids (1+F)*poids(u->v), quand u->v a une fatigue f dans g, 
         pour toute F telle que F+f <= Fmax.
+
+        Complexité en O( (V + E)*Fmax ). (V:nombre de sommets, E: nombre d'arêtes)
+
+
         """
         n = len(self._roads)
-        fatigues = [voisin[2] for sommet in self._roads for voisin in self._roads[sommet]] #on récupère toutes les fatigues
+        fatigues = [voisin[2] for sommet in self._roads for voisin in self._roads[sommet]] 
         Fmax = (n-1)*max(fatigues) if fatigues else 0  # fatigue maximale d'un chemin optimal puisque pour parcourir un graphe à n noeuds il faut n-1 arrêtes 
         edges = {}
     

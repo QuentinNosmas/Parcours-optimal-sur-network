@@ -76,6 +76,9 @@ class Graph:
         ---------
         (chemin, distance) : liste des nœuds et distance totale,
                          ou (None, inf) si vt est inatteignable.
+
+        Complexité en O( (V + E)ln(V) ) pour pruning = False et h = 0 : Dijkstra classique.
+        (V:nombre de sommets, E:nombre d'arêtes)
         """
         if is_target is None:
             is_target = lambda node: node == vt
