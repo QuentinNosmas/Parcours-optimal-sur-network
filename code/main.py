@@ -143,12 +143,16 @@ pruning=True, A*=True — distance : 29934, temps : 0.0078s
 
 network_test = Network.from_file(r"examples\large-smallfatigue.txt")
 
-# on choisit pour heuristique la distance entre le noeud d'arrivé et le noeud actuel,
-#Cette heuristique est admissible car on prend une fatigue = 0
-# alors que la fatigue augmente le coût des arrêtes!
+"""
+on choisit pour heuristique la distance entre le noeud d'arrivé et le noeud actue dans un graphe simple,
+multipliée par la 1+la fatigue du noeud courant.
+Cette heuristique est admissible car les fatigues sont toujours >= 0, donc un chemin partant du noeud 
+courant est toujours plus long que si la fatigue était restée constante à partir du noeud courant.
+alors que la fatigue augmente le coût des arrêtes!
+"""
 graph_inverse = network_test.build_simple_graph(inverse=True)
 h = graph_inverse.distances_depuis(network_test.end)
-heuristique = lambda node: h.get(node[0], float("inf"))
+heuristique = lambda node: (1+node[1])*h.get(node[0], float("inf"))
 
 graph_implicit = GraphImplicit(network_test)
 print("---Comparaison pruning et heuristique 2---")
@@ -164,11 +168,19 @@ for pruning, avec_h in [(True, False), (True, True)]:
     )
     print(f"{label} — distance : {dist}, temps : {time.time() - debut:.4f}s")
 
+
 """
----Comparaison pruning et heuristique 2---
+---Comparaison pruning et heuristique 2--- avec heuristique distance simple graph
 Noeuds prunés : 558048
 pruning=True, A*=False — distance : 2000993, temps : 16.2147s
 Noeuds prunés : 557876
 pruning=True, A*=True — distance : 2000993, temps : 16.0221s
-PS C:\Users\qnosm\OneDrive\Bureau\ENSAE\info 1A\ensae-prog26>
+PS C:/Users/qnosm/OneDrive/Bureau/ENSAE/info 1A/ensae-prog26>
+
+---Comparaison pruning et heuristique 2---  avec heuristique (1+f)*distance simple graph
+Noeuds prunés : 558048
+pruning=True, A*=False — distance : 2000993, temps : 21.4233s
+Noeuds prunés : 410710
+pruning=True, A*=True — distance : 2000993, temps : 17.6870s
+(fait sur l'ordinateur de maxime)
 """
