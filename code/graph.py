@@ -2,6 +2,8 @@
 This is the graph module. It contains the classes Graph and GraphImplicit
 """
 import heapq
+import itertools
+from typing import Any, Callable, Dict, List, Tuple
 
 
 class Graph:
@@ -132,6 +134,59 @@ class Graph:
             print(f"Noeuds prunés : {compteur_prune}")
 
         return chemin, d[u_actuel]
+    
+
+    def pareto_filter(self,liste_de_couples):
+        """
+        Filtre une liste de couples (temps, fatigue) pour ne garder que ceux qui sont Pareto-optimaux.
+        """
+        liste_triee = sorted(liste_de_couples, key=lambda x: (x[0], x[1]))
+    
+        resultat = []
+        F_min_courant = float('inf')
+    
+        for t, F in liste_triee:
+            if F < F_min_courant:
+                resultat.append((t, F))
+                F_min_courant = F
+            
+        return resultat
+
+    def pareto_paths(self, source, target, initial_fatigue):
+        
+        chemin, _ = self.shortest_path(source, target, pruning=True)
+        F_opt = chemin[-1][1]
+
+        tie_breaker = itertools.count()
+        file = []
+        heapq.heappush(file, (0, next(tie_breaker), (source, initial_fatigue)))
+
+        visites = {}   
+        resultats = []
+
+        while file:
+            t, _, (v, F) = heapq.heappop(file)
+
+            if v not in visites:
+                visites[v] = []
+
+            # Pareto pruning : ignorer si un état déjà visité domine (t, F)
+            if any(t_p <= t and F_p <= F for t_p, F_p in visites[v]):
+                continue
+
+            visites[v].append((t, F))
+
+            if v == target:
+                resultats.append((t, F))
+                continue
+
+            for u, poids in self.neighbours((v, F)):
+                F_nouveau = u[1] 
+                if F_nouveau <= F_opt:
+                    heapq.heappush(file, (t + poids, next(tie_breaker), u))
+                
+        # Filtrage final : ne garder que les couples non Pareto-dominés
+        return self.pareto_filter(resultats)
     
     
     
