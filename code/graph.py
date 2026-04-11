@@ -188,9 +188,9 @@ class Graph:
         # Filtrage final : ne garder que les couples non Pareto-dominés
         return self.pareto_filter(resultats)
     
-    def shortest_path_mission(self,source,target,f):
+    def shortest_path_mission(self,source,target,f,sequence_complete):
 
-        fronts = [(0.0, initial_fatigue)]
+        fronts = [(source, f)]
 
         # Parcours de chaque segment de l'itinéraire
         for source, target in sequence_complete:
