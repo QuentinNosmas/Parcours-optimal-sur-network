@@ -52,7 +52,12 @@ chemin, dist = graph_implicit.shortest_path(
     pruning=True
 )
 print(f"Distance : {dist}, temps : {time.time() - debut:.4f}s")
-"""
+
+#%%
+from network import *
+from graph import Graph
+import time
+
 print("large-largefatigue.txt")
 network_test = Network.from_file(r"examples\large-largefatigue.txt")
 graph_implicit = GraphImplicit(network_test)
@@ -79,9 +84,8 @@ chemin, dist = graph_implicit.shortest_path(
     pruning=True
 )
 print(f"Distance : {dist}, temps : {time.time() - debut:.4f}s")
-329s et 8338974 noeuds prunés énorme !
-"""
-"""
+'329s et 8338974 noeuds prunés énorme !'
+
 print("large-smallfatigue.txt")
 network_test = Network.from_file(r"examples\large-smallfatigue.txt")
 graph_implicit = GraphImplicit(network_test)
@@ -105,8 +109,13 @@ chemin, dist = graph_implicit.shortest_path(
     pruning=True
 )
 print(f"Distance : {dist}, temps : {time.time() - debut:.4f}s")
+"""
 558048 prunés, 15s
 """
+#%%
+from network import *
+from graph import Graph
+import time
 
 network_test = Network.from_file(r"examples\medium-smallfatigue.txt")
 
@@ -140,6 +149,10 @@ pruning=False, A*=True — distance : 29934, temps : 0.0506s
 Noeuds prunés : 969
 pruning=True, A*=True — distance : 29934, temps : 0.0078s
 """
+#%%
+from network import *
+from graph import Graph
+import time
 
 network_test = Network.from_file(r"examples\large-smallfatigue.txt")
 
@@ -184,3 +197,27 @@ Noeuds prunés : 410710
 pruning=True, A*=True — distance : 2000993, temps : 17.6870s
 (fait sur l'ordinateur de maxime)
 """
+
+#%%
+from network import *
+from graph import Graph
+import time
+
+"""Test de shortest_path_mission"""
+network = Network.from_file(r"examples\medium-smallfatigue.txt")
+
+graph = GraphImplicit(network)
+
+# Définir des missions arbitraires (choisis des sommets qui existent dans le fichier)
+missions = [(v8, v16), (v16, v50), (v50, v60)]
+
+
+temps = graph.shortest_path_mission(missions)
+print(f"Temps total : {temps}")
+
+# Vérification de cohérence : comparer avec deux shortest_path indépendants
+_, t1 = graph.shortest_path(v8, v16, pruning=True)
+_, t2 = graph.shortest_path(v16, v50, pruning=True)
+_, t3 = graph.shortest_path(v50, v60)
+print(f"Somme naïve : {t1 + t2 + t3}") 
+# %%
