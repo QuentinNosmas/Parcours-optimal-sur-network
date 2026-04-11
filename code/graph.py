@@ -188,7 +188,38 @@ class Graph:
         # Filtrage final : ne garder que les couples non Pareto-dominés
         return self.pareto_filter(resultats)
     
+    def shortest_path_mission(self,source,target,f):
+
+        fronts = [(0.0, initial_fatigue)]
+
+        # Parcours de chaque segment de l'itinéraire
+        for source, target in sequence_complete:
+            pool = []
+        
+            # Pour chaque état (temps cumulé, fatigue actuelle) du front
+            for t, F in fronts:
+                # On calcule les chemins possibles pour le segment courant, 
+                # en partant avec la fatigue F
+                candidats = self.pareto_paths(source, target, F)
+            
+                # On cumule le temps (t + dt) et on récupère la nouvelle fatigue
+                for dt, F_finale in candidats:
+                    pool.append((t + dt, F_finale))
+        
+            # On filtre pour ne garder que les états non dominés avant 
+            # d'attaquer le segment suivant (évite l'explosion combinatoire)
+            fronts = self.pareto_filter(pool)
+        
+            # Sécurité : si aucun chemin n'a été trouvé pour ce segment, 
+            # la séquence entière est impossible.
+            if not fronts:
+                return float('inf')
+
+        # À la fin de la séquence, on cherche le temps minimum
+        # parmi tous les états valides restants.
+        temps_minimum = min(t for t, F in fronts)
     
+        return temps_minimum
     
 
 
