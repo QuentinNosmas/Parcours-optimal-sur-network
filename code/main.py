@@ -98,7 +98,7 @@ chemin, dist = graph_implicit.shortest_path(
     is_target=lambda node: node[0] == network_test.end
 )
 print(f"Distance : {dist}, temps : {time.time() - debut:.4f}s")
-337s
+
 
 print("Avec pruning")
 debut = time.time()
@@ -209,15 +209,28 @@ network = Network.from_file(r"examples\medium-smallfatigue.txt")
 graph = GraphImplicit(network)
 
 # Définir des missions arbitraires (choisis des sommets qui existent dans le fichier)
-missions = [(v8, v16), (v16, v50), (v50, v60)]
+missions = [('v8', 'v16'), ('v16', 'v50'), ('v50', 'v60')]
 
 
 temps = graph.shortest_path_mission(missions)
 print(f"Temps total : {temps}")
 
 # Vérification de cohérence : comparer avec deux shortest_path indépendants
-_, t1 = graph.shortest_path(v8, v16, pruning=True)
-_, t2 = graph.shortest_path(v16, v50, pruning=True)
-_, t3 = graph.shortest_path(v50, v60)
-print(f"Somme naïve : {t1 + t2 + t3}") 
+chemin1, t1 = graph.shortest_path(('v8',1), 'v16', is_target=lambda node: node[0] == 'v16', pruning=True)
+chemin2, t2 = graph.shortest_path(('v16',chemin1[-1][1]), 'v50', is_target=lambda node: node[0] == 'v50', pruning=True)
+_, t3 = graph.shortest_path(('v50',chemin2[-1][1]), 'v60', is_target=lambda node: node[0] == 'v60', pruning=True)
+print(f"Temps naïf : {t1 + t2 + t3}") 
+
+# Test de cohérence avec une mission à un seul chemin
+
+mission = [('v8', 'v16')]
+
+# Résultat avec la fonction multi-mission
+temps_mission = graph.shortest_path_mission(mission)
+
+# Résultat avec shortest_path classique sur le même segment
+chemin, temps_direct = graph.shortest_path(('v8', 1),'v16',is_target=lambda node: node[0] == 'v16',
+    pruning=True)
+
+print(f"Temps mission : {temps_mission}, Temps direct : {temps_direct}")
 # %%

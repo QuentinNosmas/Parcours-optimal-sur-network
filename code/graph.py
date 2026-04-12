@@ -153,8 +153,16 @@ class Graph:
         return resultat
 
     def pareto_paths(self, source, target, initial_fatigue):
+
+        """
+        C'est une exploration type Dijkstra sur le graphe étendu, 
+        avec un pruning de Pareto, qui calcule tous les couples 
+        (temps, fatigue) non dominés permettant d'atteindre target 
+        depuis (source, fatigue initiale).
+        """
         
-        chemin, _ = self.shortest_path(source, target, pruning=True)
+        chemin, _ = self.shortest_path((source, initial_fatigue), target, 
+                                       is_target=lambda node: node[0] == target, pruning=True)
         F_opt = chemin[-1][1]
 
         tie_breaker = itertools.count()
@@ -190,7 +198,7 @@ class Graph:
     
     def shortest_path_mission(self,sequence_complete):
 
-        fronts = [(0,0)]
+        fronts = [(0,1)]
 
         # Parcours de chaque segment de l'itinéraire
         for source, target in sequence_complete:
