@@ -93,9 +93,12 @@ class Graph:
         u_actuel = None
         pareto = {} #Dictionnaire permettant de mémoriser les sommets avec la fatigue et la distance avec lesquelles on les a rencontré
         compteur_prune = 0 #Enregistre le nombre de sommets éliminés par prunning.
+        compteur_éxploré = 0
 
         while file_prio: 
+            compteur_éxploré+=1
             _, dist_a, u_actuel = heapq.heappop(file_prio)
+        
 
             if dist_a > d[u_actuel]: #Noeud extrait obsolète
                 continue #Sinon on le mémorise 
@@ -118,7 +121,7 @@ class Graph:
                         if sommet in pareto and any(t <= nouvelle_distance and fa <= f for t, fa in pareto[sommet]): #sommet déjà rencontré avec distance et fatigue plus faible
                             compteur_prune += 1
                             is_pruné = True  #on l'ignore
-                        pareto.setdefault(sommet, []).append((dist_a, f))
+                        pareto.setdefault(sommet, []).append((nouvelle_distance, f))
                     if not is_pruné:
                         heapq.heappush(file_prio, (d[u] + h(u), d[u], u)) #La priorité donnée dépend de l'heuristique
 
@@ -134,6 +137,7 @@ class Graph:
 
         if pruning:
             print(f"Noeuds prunés : {compteur_prune}")
+            print(f"Noeuds explorés : {compteur_éxploré}")
 
         return chemin, d[u_actuel]
     
