@@ -126,7 +126,7 @@ network_test = Network.from_file(r"examples\medium-largefatigue.txt")
 # alors que la fatigue augmente le coût des arrêtes!
 graph_inverse = network_test.build_simple_graph(inverse=True)
 h = graph_inverse.distances_depuis(network_test.end)
-heuristique = lambda node: h.get(node[0], float("inf"))
+heuristique = lambda node: (1 + node[1])*h.get(node[0], float("inf"))
 
 graph_implicit = GraphImplicit(network_test)
 print("___MEDIUM-LARGEFATIGUE___")
@@ -168,7 +168,7 @@ alors que la fatigue augmente le coût des arrêtes!
 """
 graph_inverse = network_test.build_simple_graph(inverse=True)
 h = graph_inverse.distances_depuis(network_test.end)
-heuristique = lambda node: (1+node[1])*h.get(node[0], float("inf"))
+heuristique = lambda node: (1 + node[1])*h.get(node[0], float("inf"))
 
 graph_implicit = GraphImplicit(network_test)
 print("---Comparaison pruning et heuristique 2---")
