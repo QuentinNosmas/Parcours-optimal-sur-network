@@ -98,19 +98,14 @@ class Graph:
             _, dist_a, u_actuel = heapq.heappop(file_prio)
 
             if dist_a > d[u_actuel]: #Noeud extrait obsolète
-                continue
-
-            if pruning: 
-                sommet, f = u_actuel
-                if sommet in pareto and any(t <= dist_a and fa <= f for t, fa in pareto[sommet]): #sommet déjà rencontré avec distance et fatigue plus faible
-                    compteur_prune += 1
-                    continue  #on l'ignore
-                pareto.setdefault(sommet, []).append((dist_a, f)) #Sinon on le mémorise 
+                continue #Sinon on le mémorise 
 
             if is_target(u_actuel): #Condition d'arrêt : on est arrivé à destination
                 break
 
-            for u, poids in self.neighbours(u_actuel): #même boucle que Dijsktra, modulée de l'heuristique
+            for u, poids in self.neighbours(u_actuel): 
+                is_pruné=False
+                
                 if u not in d:
                     d[u] = float("inf")
                     predecesseurs[u] = None
@@ -118,7 +113,14 @@ class Graph:
                 if nouvelle_distance < d[u]:
                     d[u] = nouvelle_distance
                     predecesseurs[u] = u_actuel
-                    heapq.heappush(file_prio, (d[u] + h(u), d[u], u)) #La priorité donnée dépend de l'heuristique
+                    if pruning: 
+                        sommet, f = u
+                        if sommet in pareto and any(t <= nouvelle_distance and fa <= f for t, fa in pareto[sommet]): #sommet déjà rencontré avec distance et fatigue plus faible
+                            compteur_prune += 1
+                            is_pruné = True  #on l'ignore
+                        pareto.setdefault(sommet, []).append((dist_a, f))
+                    if not is_pruné:
+                        heapq.heappush(file_prio, (d[u] + h(u), d[u], u)) #La priorité donnée dépend de l'heuristique
 
         if not is_target(u_actuel): #Aucun chemin ne mène à vt
             return None, float("inf")
@@ -173,25 +175,25 @@ class Graph:
         resultats = []
 
         while file:
-            t, _, (v, F) = heapq.heappop(file)
+            dist, _, (v, F) = heapq.heappop(file)
 
             if v not in visites:
                 visites[v] = []
 
             # Pareto pruning : ignorer si un état déjà visité domine (t, F)
-            if any(t_p <= t and F_p <= F for t_p, F_p in visites[v]):
+            if any(d <= dist and F_p <= F for d, F_p in visites[v]):
                 continue
 
-            visites[v].append((t, F))
+            visites[v].append((dist, F))
 
             if v == target:
-                resultats.append((t, F))
+                resultats.append((dist, F))
                 continue
 
             for u, poids in self.neighbours((v, F)):
                 F_nouveau = u[1] 
                 if F_nouveau <= F_opt:
-                    heapq.heappush(file, (t + poids, next(tie_breaker), u))
+                    heapq.heappush(file, (dist + poids, next(tie_breaker), u))
                 
         # Filtrage final : ne garder que les couples non Pareto-dominés
         return self.pareto_filter(resultats)

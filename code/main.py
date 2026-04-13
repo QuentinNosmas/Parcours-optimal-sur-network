@@ -1,3 +1,5 @@
+
+#%%
 from network import *
 from graph import Graph
 import time
@@ -117,7 +119,7 @@ from network import *
 from graph import Graph
 import time
 
-network_test = Network.from_file(r"examples\medium-smallfatigue.txt")
+network_test = Network.from_file(r"examples\medium-largefatigue.txt")
 
 # on choisit pour heuristique la distance entre le noeud d'arrivé et le noeud actuel,
 #Cette heuristique est admissible car on prend une fatigue = 0
@@ -127,7 +129,8 @@ h = graph_inverse.distances_depuis(network_test.end)
 heuristique = lambda node: h.get(node[0], float("inf"))
 
 graph_implicit = GraphImplicit(network_test)
-print("---Comparaison pruning et heuristique---")
+print("___MEDIUM-LARGEFATIGUE___")
+print("Comparaison pruning et heuristique")
 for pruning, avec_h in [(False, False), (True, False), (False, True), (True, True)]:
     label = f"pruning={pruning}, A*={avec_h}"
     debut = time.time()
@@ -141,7 +144,7 @@ for pruning, avec_h in [(False, False), (True, False), (False, True), (True, Tru
     print(f"{label} — distance : {dist}, temps : {time.time() - debut:.4f}s")
 
 """
----Comparaison pruning et heuristique---
+Comparaison pruning et heuristique sur medium-smallfatigue.txt:
 pruning=False, A*=False — distance : 29934, temps : 0.0440s
 Noeuds prunés : 982
 pruning=True, A*=False — distance : 29934, temps : 0.0073s
