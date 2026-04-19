@@ -142,18 +142,18 @@ class Graph:
         return chemin, d[u_actuel]
     
 
-    def pareto_filter(self,liste_de_couples):
+    def pareto_filter(self,liste_de_triplets):
         """
-        Filtre une liste de couples (temps, fatigue) pour ne garder que ceux qui sont Pareto-optimaux.
+        Filtre une liste de couples (temps, fatigue, chemin) pour ne garder que ceux qui sont Pareto-optimaux.
         """
-        liste_triee = sorted(liste_de_couples, key=lambda x: (x[0], x[1]))
+        liste_triee = sorted(liste_de_triplets, key=lambda x: (x[0], x[1]))
     
         resultat = []
         F_min_courant = float('inf')
     
-        for t, F in liste_triee:
+        for t, F, sommet_etendu in liste_triee:
             if F < F_min_courant:
-                resultat.append((t, F))
+                resultat.append((t, F, sommet_etendu))
                 F_min_courant = F
             
         return resultat
@@ -173,10 +173,12 @@ class Graph:
 
         tie_breaker = itertools.count()
         file = []
-        heapq.heappush(file, (0, next(tie_breaker), (source, initial_fatigue)))
+        etat_initial = (source, initial_fatigue)
+        heapq.heappush(file, (0, next(tie_breaker), etat_initial))
 
         visites = {}   
         resultats = []
+        predecesseurs = {(etat_initial, 0): None}
 
         while file:
             dist, _, (v, F) = heapq.heappop(file)
@@ -191,34 +193,57 @@ class Graph:
             visites[v].append((dist, F))
 
             if v == target:
-                resultats.append((dist, F))
+                resultats.append((dist, F, (v, F)))
                 continue
 
             for u, poids in self.neighbours((v, F)):
                 F_nouveau = u[1] 
                 if F_nouveau <= F_opt:
-                    heapq.heappush(file, (dist + poids, next(tie_breaker), u))
+                    nouvelle_dist = dist + poids
+                    cle = (u, nouvelle_dist)
+                    if cle not in predecesseurs: # On ne mémorise qu'un seul chemin optimal
+                        predecesseurs[cle] = ((v, F), dist)
+                    heapq.heappush(file, (nouvelle_dist, next(tie_breaker), u))
+
+        resultats_filtres = self.pareto_filter(resultats)
+
+        resultats_avec_chemins = []
+        for t_final, F_final, etat_final in resultats_filtres:
+            chemin = []
+            etat_courant, t_courant = etat_final, t_final
+            while etat_courant is not None:
+                chemin.append(etat_courant)
+                pred = predecesseurs.get((etat_courant, t_courant))
+                if pred is None:
+                    break
+                etat_courant, t_courant = pred
+            chemin.reverse()
+            resultats_avec_chemins.append((t_final, F_final, chemin))
                 
         # Filtrage final : ne garder que les couples non Pareto-dominés
-        return self.pareto_filter(resultats)
+        return resultats_avec_chemins
     
     def shortest_path_mission(self,sequence_complete):
 
-        fronts = [(0,1)]
+        fronts = [(0, 1, [])]
 
         # Parcours de chaque segment de l'itinéraire
         for source, target in sequence_complete:
             pool = []
         
             # Pour chaque état (temps cumulé, fatigue actuelle) du front
-            for t, F in fronts:
+            for t, F, chemin in fronts:
                 # On calcule les chemins possibles pour le segment courant, 
                 # en partant avec la fatigue F
                 candidats = self.pareto_paths(source, target, F)
             
                 # On cumule le temps (t + dt) et on récupère la nouvelle fatigue
-                for dt, F_finale in candidats:
-                    pool.append((t + dt, F_finale))
+                for dt, F_finale, chemin_segment in candidats:
+                    if chemin:
+                        nouveau_chemin = chemin + chemin_segment[1:]
+                    else:
+                        nouveau_chemin = list(chemin_segment)
+                    pool.append((t + dt, F_finale, nouveau_chemin))
         
             # On filtre pour ne garder que les états non dominés avant 
             # d'attaquer le segment suivant (évite l'explosion combinatoire)
@@ -227,13 +252,13 @@ class Graph:
             # Sécurité : si aucun chemin n'a été trouvé pour ce segment, 
             # la séquence entière est impossible.
             if not fronts:
-                return float('inf')
+                return float('inf'), None
 
         # À la fin de la séquence, on cherche le temps minimum
         # parmi tous les états valides restants.
-        temps_minimum = min(t for t, F in fronts)
+        t_min, F_min, chemin_min = min(fronts, key=lambda x: x[0])
     
-        return temps_minimum
+        return t_min, chemin_min
     
 
 
