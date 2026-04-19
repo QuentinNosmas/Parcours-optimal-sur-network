@@ -258,7 +258,7 @@ class Graph:
         # parmi tous les états valides restants.
         t_min, F_min, chemin_min = min(fronts, key=lambda x: x[0])
     
-        return t_min, chemin_min
+        return t_min, [sommet_etendu[0] for sommet_etendu in chemin_min]
     
 
 
