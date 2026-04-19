@@ -141,7 +141,7 @@ for pruning, avec_h in [(False, False), (True, False), (False, True), (True, Tru
         pruning=pruning,
         heuristique=heuristique if avec_h else None
     )
-    print(f"{label} — distance : {dist}, temps : {time.time() - debut:.4f}s")
+    print(f"{label} — temps_finale : {dist}, temps d'éxécution : {time.time() - debut:.4f}s")
 
 """
 Comparaison pruning et heuristique sur medium-smallfatigue.txt:
