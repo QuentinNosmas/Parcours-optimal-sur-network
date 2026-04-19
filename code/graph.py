@@ -144,7 +144,7 @@ class Graph:
 
     def pareto_filter(self,liste_de_triplets):
         """
-        Filtre une liste de couples (temps, fatigue, chemin) pour ne garder que ceux qui sont Pareto-optimaux.
+        Filtre une liste de couples (temps, fatigue, sommet) pour ne garder que ceux qui sont Pareto-optimaux.
         """
         liste_triee = sorted(liste_de_triplets, key=lambda x: (x[0], x[1]))
     
@@ -162,8 +162,8 @@ class Graph:
 
         """
         C'est une exploration type Dijkstra sur le graphe étendu, 
-        avec un pruning de Pareto, qui calcule tous les couples 
-        (temps, fatigue) non dominés permettant d'atteindre target 
+        avec un pruning de Pareto, qui calcule tous les triplets 
+        (temps, fatigue, chemin) non dominés permettant d'atteindre target 
         depuis (source, fatigue initiale).
         """
         
@@ -208,7 +208,7 @@ class Graph:
         resultats_filtres = self.pareto_filter(resultats)
 
         resultats_avec_chemins = []
-        for t_final, F_final, etat_final in resultats_filtres:
+        for t_final, F_final, etat_final in resultats_filtres:  #Reconstruire les chemins à partir de predecesseurs
             chemin = []
             etat_courant, t_courant = etat_final, t_final
             while etat_courant is not None:
@@ -231,16 +231,16 @@ class Graph:
         for source, target in sequence_complete:
             pool = []
         
-            # Pour chaque état (temps cumulé, fatigue actuelle) du front
+            # Pour chaque état (temps cumulé, fatigue actuelle, chemin) du front
             for t, F, chemin in fronts:
                 # On calcule les chemins possibles pour le segment courant, 
                 # en partant avec la fatigue F
                 candidats = self.pareto_paths(source, target, F)
             
-                # On cumule le temps (t + dt) et on récupère la nouvelle fatigue
+                # On cumule le temps (t + dt) et on récupère la nouvelle fatigue et le nouveau chemin
                 for dt, F_finale, chemin_segment in candidats:
                     if chemin:
-                        nouveau_chemin = chemin + chemin_segment[1:]
+                        nouveau_chemin = chemin + chemin_segment[1:] # ne pas doubler un des sommet dans le chemin
                     else:
                         nouveau_chemin = list(chemin_segment)
                     pool.append((t + dt, F_finale, nouveau_chemin))
@@ -255,10 +255,10 @@ class Graph:
                 return float('inf'), None
 
         # À la fin de la séquence, on cherche le temps minimum
-        # parmi tous les états valides restants.
+        # parmi tous les états valides restants, et le chemin correspondant.
         t_min, F_min, chemin_min = min(fronts, key=lambda x: x[0])
     
-        return t_min, [sommet_etendu[0] for sommet_etendu in chemin_min]
+        return t_min, [sommet_etendu[0] for sommet_etendu in chemin_min] #Les sommet sont des sommets étendus. On ne garde que le nom de chaque sommet
     
 
 
